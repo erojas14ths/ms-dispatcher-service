@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ms-dispatcher-service
+  namespace: polar
+  labels:
+    app: ms-dispatcher-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ms-dispatcher-service
+  template:
+    metadata:
+      labels:
+        app: ms-dispatcher-service
+    spec:
+      containers:
+        - name: ms-dispatcher-service
+          image: ms-dispatcher-service
+          imagePullPolicy: IfNotPresent
+          lifecycle:
+            preStop:
+              exec:
+                command: [ "sh", "-c", "sleep 5" ]
+          ports:
+            - containerPort: 9003
+          env:
+            - name: SPRING_CLOUD_CONFIG_URI
+              value: http://cf-config-service
+            - name: SPRING_RABBITMQ_HOST
+              value: polar-rabbitmq
